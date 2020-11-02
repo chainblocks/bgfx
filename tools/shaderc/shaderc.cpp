@@ -146,6 +146,7 @@ namespace bgfx
 		NULL
 	};
 
+#ifndef BGFX_SHADERC_NO_MAIN
 	const char* s_uniformTypeName[] =
 	{
 		"int",  "int",
@@ -155,6 +156,9 @@ namespace bgfx
 		"mat4", "float4x4",
 	};
 	BX_STATIC_ASSERT(BX_COUNTOF(s_uniformTypeName) == UniformType::Count*2);
+#else
+	extern const char** s_uniformTypeName;
+#endif
 
 	static const char* s_allowedVertexShaderInputs[] =
 	{
@@ -277,6 +281,7 @@ namespace bgfx
 		return _glsl; // centroid, noperspective
 	}
 
+#ifndef BGFX_SHADERC_NO_MAIN
 	const char* getUniformTypeName(UniformType::Enum _enum)
 	{
 		uint32_t idx = _enum & ~(kUniformFragmentBit|kUniformSamplerBit);
@@ -287,7 +292,11 @@ namespace bgfx
 
 		return "Unknown uniform type?!";
 	}
+#else
+	const char* getUniformTypeName(UniformType::Enum _enum);
+#endif
 
+#ifndef BGFX_SHADERC_NO_MAIN
 	UniformType::Enum nameToUniformTypeEnum(const char* _name)
 	{
 		for (uint32_t ii = 0; ii < UniformType::Count*2; ++ii)
@@ -301,6 +310,9 @@ namespace bgfx
 
 		return UniformType::Count;
 	}
+#else
+	UniformType::Enum nameToUniformTypeEnum(const char* _name);
+#endif
 
 	int32_t writef(bx::WriterI* _writer, const char* _format, ...)
 	{
@@ -2619,7 +2631,11 @@ namespace bgfx
 
 } // namespace bgfx
 
+#ifndef BGFX_SHADERC_NO_MAIN
+
 int main(int _argc, const char* _argv[])
 {
 	return bgfx::compileShader(_argc, _argv);
 }
+
+#endif
