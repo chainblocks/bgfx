@@ -948,7 +948,11 @@ namespace bgfx
 		return word;
 	}
 
+#ifdef BGFX_SHADERC_NO_MAIN
 	bool compileShader(const char* _varying, const char* _comment, char* _shader, uint32_t _shaderLen, Options& _options, bx::FileWriter* _writer)
+#else
+	bool compileShader(const char* _varying, const char* _comment, char* _shader, uint32_t _shaderLen, Options& _options, bx::WriterI* _writer)
+#endif
 	{
 		uint32_t glsl  = 0;
 		uint32_t essl  = 0;
@@ -1295,12 +1299,13 @@ namespace bgfx
 				// first preprocess pass is used to strip all comments before
 				// substituting code.
 				bool ok = preprocessor.run(data);
-				delete [] data;
-
+				
 				if (!ok)
 				{
 					return false;
 				}
+
+				delete [] data;
 
 				size = (uint32_t)preprocessor.m_preprocessed.size();
 				data = new char[size+padding+1];
