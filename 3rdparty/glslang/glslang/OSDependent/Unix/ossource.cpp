@@ -32,6 +32,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 
+#ifndef __WASI__
+
 //
 // This file contains the Linux-specific functions
 //
@@ -205,3 +207,5 @@ void OS_DumpMemoryCounters()
 }
 
 } // end namespace glslang
+
+#endif

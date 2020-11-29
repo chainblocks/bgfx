@@ -948,11 +948,7 @@ namespace bgfx
 		return word;
 	}
 
-#ifdef BGFX_SHADERC_NO_MAIN
 	bool compileShader(const char* _varying, const char* _comment, char* _shader, uint32_t _shaderLen, Options& _options, bx::WriterI* _writer)
-#else
-	bool compileShader(const char* _varying, const char* _comment, char* _shader, uint32_t _shaderLen, Options& _options, bx::FileWriter* _writer)
-#endif
 	{
 		uint32_t glsl  = 0;
 		uint32_t essl  = 0;
