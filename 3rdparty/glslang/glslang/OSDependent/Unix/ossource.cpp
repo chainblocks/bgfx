@@ -208,4 +208,8 @@ void OS_DumpMemoryCounters()
 
 } // end namespace glslang
 
+#else
+
+#include "../osinclude_stubs.cpp"
+
 #endif

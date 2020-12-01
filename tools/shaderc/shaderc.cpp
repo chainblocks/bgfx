@@ -2624,7 +2624,9 @@ namespace bgfx
 			return bx::kExitSuccess;
 		}
 
+#ifndef __WASI__
 		bx::remove(outFilePath);
+#endif
 
 		bx::printf("Failed to build shader.\n");
 		return bx::kExitFailure;

@@ -32,6 +32,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 
+#ifndef __WASI__
+
 #include "../osinclude.h"
 
 #define STRICT
@@ -145,3 +147,9 @@ void OS_DumpMemoryCounters()
 }
 
 } // namespace glslang
+
+#else
+
+#include "../osinclude_stubs.cpp"
+
+#endif

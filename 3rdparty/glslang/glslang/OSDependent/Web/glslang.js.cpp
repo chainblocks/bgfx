@@ -269,7 +269,7 @@ void destroy_output_buffer(void* p)
  * built and output analyzed using desktop tools, since WASM binaries are
  * specific to the Emscripten toolchain.
  */
-#ifndef __EMSCRIPTEN__
+#if !defined(__EMSCRIPTEN__) && !defined(__WASI__)
 int main() {
     const char* input = R"(#version 310 es
 
