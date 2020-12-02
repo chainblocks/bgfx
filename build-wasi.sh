@@ -33,7 +33,10 @@ sed -i 's/ -Wlogical-op//g' spirv-opt.make
 sed -i 's/ -Wlogical-op//g' spirv-cross.make
 sed -i 's/ -Wlogical-op//g' shaderc.make
 
-sed -i 's/.exe/.wasm/g' shaderc.make
+sed -i 's/shadercRelease.exe/shadercRelease.wasm/g' shaderc.make
+sed -i 's/shadercDebug.exe/shadercDebug.wasm/g' shaderc.make
+sed -i 's/shadercRelease/shadercRelease.wasm/g' shaderc.make
+sed -i 's/shadercDebug/shadercDebug.wasm/g' shaderc.make
 sed -i 's/$(SILENT) strip -s "$(TARGET)"//g' shaderc.make
 
 sed -i 's/-O3/-Os/g' bx.make
