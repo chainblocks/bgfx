@@ -65,13 +65,13 @@ if [ $BUILD_TYPE = "debug32" ]; then
 fi
 
 ARCH="--target=wasm32-wasi --sysroot=$WASISDK/share/wasi-sysroot $USE_LTO"
-DEFINES="-DBX_CONFIG_SUPPORTS_THREADING=0 -D__WASI__=1 -DENABLE_HLSL=1 -DENABLE_OPT=1 -DSPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS=1 -DBGFX_CONFIG_MULTITHREADED=0 $OPT_LEVEL"
+DEFINES="-DBX_CONFIG_SUPPORTS_THREADING=0 -D__WASI__=1 -DBGFX_CONFIG_MULTITHREADED=0 $OPT_LEVEL"
 JOBS=`nproc --all`
 
-$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH" DEFINES="$DEFINES" bx
-$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH" DEFINES="$DEFINES" fcpp
-$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH" DEFINES="$DEFINES" glslang
-$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH" DEFINES="$DEFINES" glsl-optimizer
-$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH" DEFINES="$DEFINES" spirv-opt
-$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH" DEFINES="$DEFINES" spirv-cross
-$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH $STRIP_LEVEL -Wl,-z,stack-size=1048576" DEFINES="$DEFINES" shaderc
+$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH $DEFINES" bx
+$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH $DEFINES" fcpp
+$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH $DEFINES" glslang
+$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH $DEFINES" glsl-optimizer
+$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH $DEFINES" spirv-opt
+$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH $DEFINES" spirv-cross
+$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH $STRIP_LEVEL -Wl,-z,stack-size=1048576 $DEFINES" shaderc
