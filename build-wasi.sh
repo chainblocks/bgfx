@@ -33,10 +33,14 @@ sed -i 's/ -Wlogical-op//g' spirv-opt.make
 sed -i 's/ -Wlogical-op//g' spirv-cross.make
 sed -i 's/ -Wlogical-op//g' shaderc.make
 
-sed -i 's/shadercRelease.exe/shadercRelease.wasm/g' shaderc.make
-sed -i 's/shadercDebug.exe/shadercDebug.wasm/g' shaderc.make
-sed -i 's/shadercRelease/shadercRelease.wasm/g' shaderc.make
-sed -i 's/shadercDebug/shadercDebug.wasm/g' shaderc.make
+if uname | grep -qiE "mingw|msys"; then
+  sed -i 's/shadercRelease.exe/shadercRelease.wasm/g' shaderc.make
+  sed -i 's/shadercDebug.exe/shadercDebug.wasm/g' shaderc.make
+else
+  sed -i 's/shadercRelease/shadercRelease.wasm/g' shaderc.make
+  sed -i 's/shadercDebug/shadercDebug.wasm/g' shaderc.make
+fi
+
 sed -i 's/$(SILENT) strip -s "$(TARGET)"//g' shaderc.make
 
 sed -i 's/-O3/-Os/g' bx.make
@@ -60,7 +64,7 @@ if [ $BUILD_TYPE = "debug32" ]; then
   STRIP_LEVEL=
 fi
 
-ARCH="--target=wasm32-wasi --sysroot=$WASISDK/share/wasi-sysroot $USE_LTO -Wl,-z,stack-size=1048576"
+ARCH="--target=wasm32-wasi --sysroot=$WASISDK/share/wasi-sysroot $USE_LTO"
 DEFINES="-DBX_CONFIG_SUPPORTS_THREADING=0 -D__WASI__=1 -DENABLE_HLSL=1 -DENABLE_OPT=1 -DSPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS=1 -DBGFX_CONFIG_MULTITHREADED=0 $OPT_LEVEL"
 JOBS=`nproc --all`
 
@@ -70,4 +74,4 @@ $MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CX
 $MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH" DEFINES="$DEFINES" glsl-optimizer
 $MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH" DEFINES="$DEFINES" spirv-opt
 $MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH" DEFINES="$DEFINES" spirv-cross
-$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH $STRIP_LEVEL" DEFINES="$DEFINES" shaderc
+$MAKE config=$BUILD_TYPE -j$JOBS CC="$WASISDK/bin/clang" AR="$WASISDK/bin/ar" CXX="$WASISDK/bin/clang++" ARCH="$ARCH $STRIP_LEVEL -Wl,-z,stack-size=1048576" DEFINES="$DEFINES" shaderc
