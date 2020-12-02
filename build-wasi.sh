@@ -34,7 +34,7 @@ sed -i 's/ -Wlogical-op//g' spirv-cross.make
 sed -i 's/ -Wlogical-op//g' shaderc.make
 
 sed -i 's/.exe/.wasm/g' shaderc.make
-sed -i 's/$(SILENT) $(STRIP) -s "$(TARGET)"//g' shaderc.make
+sed -i 's/$(SILENT) strip -s "$(TARGET)"//g' shaderc.make
 
 sed -i 's/-O3/-Os/g' bx.make
 sed -i 's/-O3/-Os/g' fcpp.make
