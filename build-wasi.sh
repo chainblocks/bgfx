@@ -54,7 +54,8 @@ sed -i 's/-O3/-Os/g' shaderc.make
 # BUILD_TYPE=debug32
 BUILD_TYPE=release32
 
-USE_LTO=-flto
+# USE_LTO=-flto
+USE_LTO=
 OPT_LEVEL=
 STRIP_LEVEL=-Wl,--strip-all
 
