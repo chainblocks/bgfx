@@ -12,7 +12,7 @@ fi
 sed -i 's/ -mfpmath=sse -msse2//g' bx.make
 sed -i 's/ -mfpmath=sse -msse2//g' fcpp.make
 sed -i 's/ -mfpmath=sse -msse2//g' glslang.make
-sed -i 's/ -mfpmath=sse -msse2//g' glsl-optimizer.make
+sed -i 's/ -mfpmath=sse -msse2/ -fno-strict-aliasing/g' glsl-optimizer.make
 sed -i 's/ -mfpmath=sse -msse2//g' spirv-opt.make
 sed -i 's/ -mfpmath=sse -msse2//g' spirv-cross.make
 sed -i 's/ -mfpmath=sse -msse2//g' shaderc.make
@@ -46,7 +46,7 @@ sed -i 's/$(SILENT) strip -s "$(TARGET)"//g' shaderc.make
 sed -i 's/-O3/-Os/g' bx.make
 sed -i 's/-O3/-Os/g' fcpp.make
 sed -i 's/-O3/-Os/g' glslang.make
-sed -i 's/-O3/-Os/g' glsl-optimizer.make
+sed -i 's/-O2/-Os/g' glsl-optimizer.make
 sed -i 's/-O3/-Os/g' spirv-opt.make
 sed -i 's/-O3/-Os/g' spirv-cross.make
 sed -i 's/-O3/-Os/g' shaderc.make
@@ -54,8 +54,8 @@ sed -i 's/-O3/-Os/g' shaderc.make
 # BUILD_TYPE=debug32
 BUILD_TYPE=release32
 
-# USE_LTO=-flto
-USE_LTO=
+USE_LTO=-flto
+# USE_LTO=
 OPT_LEVEL=
 STRIP_LEVEL=-Wl,--strip-all
 
