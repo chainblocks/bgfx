@@ -3963,7 +3963,7 @@ namespace bgfx { namespace d3d11
 
 	static void patchUAVRegisterByteCode(DxbcInstruction& _instruction, void* _userData)
 	{
-		union { void* ptr; uint32_t offset; } cast = { _userData };
+		BX_UNUSED(_userData);
 
 		switch (_instruction.opcode)
 		{
@@ -3972,37 +3972,37 @@ namespace bgfx { namespace d3d11
 				DxbcOperand& operand = _instruction.operand[0];
 				operand.regIndex[0] += 16;
 
-				BX_ASSERT(operand.regIndex[1] == 0 && operand.regIndex[2] == 0
-					, "Unexpected values");
+				BX_ASSERT(operand.regIndex[1] == 0 && operand.regIndex[2] == 0, "Unexpected values");
 			}
 			break;
+
 		case DxbcOpcode::DCL_UNORDERED_ACCESS_VIEW_RAW:
-			{
-				BX_ASSERT(false, "Unsupported UAV access");
-			}
+			BX_ASSERT(false, "Unsupported UAV access");
 			break;
+
 		case DxbcOpcode::DCL_UNORDERED_ACCESS_VIEW_STRUCTURED:
-			{
-				BX_ASSERT(false, "Unsupported UAV access");
-			}
+			BX_ASSERT(false, "Unsupported UAV access");
 			break;
+
 		case DxbcOpcode::LD_UAV_TYPED:
 			{
 				DxbcOperand& operand = _instruction.operand[2];
 				operand.regIndex[0] += 16;
 
-				BX_ASSERT(operand.regIndex[1] == 0 && operand.regIndex[2] == 0
-					, "Unexpected values");
+				BX_ASSERT(operand.regIndex[1] == 0 && operand.regIndex[2] == 0, "Unexpected values");
 			}
 			break;
+
 		case DxbcOpcode::STORE_UAV_TYPED:
 			{
 				DxbcOperand& operand = _instruction.operand[0];
 				operand.regIndex[0] += 16;
 
-				BX_ASSERT(operand.regIndex[1] == 0 && operand.regIndex[2] == 0
-					, "Unexpected values");
+				BX_ASSERT(operand.regIndex[1] == 0 && operand.regIndex[2] == 0, "Unexpected values");
 			}
+			break;
+
+		default:
 			break;
 		}
 	}
@@ -6192,16 +6192,18 @@ namespace bgfx { namespace d3d11
 					}
 				}
 
-				if (currentState.m_indexBuffer.idx != draw.m_indexBuffer.idx)
+				if (currentState.m_indexBuffer.idx != draw.m_indexBuffer.idx
+				||  currentState.isIndex16() != draw.isIndex16() )
 				{
 					currentState.m_indexBuffer = draw.m_indexBuffer;
+					currentState.m_submitFlags = draw.m_submitFlags;
 
 					uint16_t handle = draw.m_indexBuffer.idx;
 					if (kInvalidHandle != handle)
 					{
 						const IndexBufferD3D11& ib = m_indexBuffers[handle];
 						deviceCtx->IASetIndexBuffer(ib.m_ptr
-							, 0 == (ib.m_flags & BGFX_BUFFER_INDEX32) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT
+							, draw.isIndex16() ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT
 							, 0
 							);
 					}
