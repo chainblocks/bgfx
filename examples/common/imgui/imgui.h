@@ -112,8 +112,10 @@ namespace ImGui
 	inline bool MouseOverArea()
 	{
 		return false
+			|| ImGui::IsAnyItemActive()
 			|| ImGui::IsAnyItemHovered()
 			|| ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)
+			|| ImGuizmo::IsOver()
 			;
 	}
 
