@@ -9,5 +9,10 @@ $input v_color0
 
 void main()
 {
-	gl_FragColor = v_color0;
+	// !! chainblocks !!
+	// alright, imgui gives us sRGB, but we want to work in linear
+	// as we have a sRGB backbuffer and require sRGB textures as well
+	vec3 sRGB = v_color0.xyz;
+	vec3 RGB = sRGB * (sRGB * (sRGB * 0.305306011 + 0.682171111) + 0.012522878);
+	gl_FragColor = vec4(RGB, v_color0.w);
 }
