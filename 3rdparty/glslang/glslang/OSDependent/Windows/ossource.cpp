@@ -32,7 +32,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 
-#ifndef __WASI__
+#if !defined(__WASI__) && !defined(__EMSCRIPTEN__)
 
 #include "../osinclude.h"
 
