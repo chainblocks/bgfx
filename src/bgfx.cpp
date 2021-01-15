@@ -9,6 +9,7 @@
 #include <bgfx/embedded_shader.h>
 #include <bx/file.h>
 #include <bx/mutex.h>
+#include <stdexcept>
 
 #include "topology.h"
 
@@ -75,7 +76,9 @@ namespace bgfx
 			{
 				bgfx::trace(_filePath, _line, "BGFX 0x%08x: %s\n", _code, _str);
 				BX_UNUSED(_code, _str);
-				abort();
+				// chainblocks - interrupt the chain with a throw rather then abort
+				// abort();
+				throw std::runtime_error(_str);
 			}
 		}
 

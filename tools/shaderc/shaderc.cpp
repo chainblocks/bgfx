@@ -1362,7 +1362,7 @@ namespace bgfx
 				// first preprocess pass is used to strip all comments before
 				// substituting code.
 				bool ok = preprocessor.run(data);
-				
+
 				if (!ok)
 				{
 					return false;
