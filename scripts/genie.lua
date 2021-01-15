@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2020 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2021 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
@@ -103,7 +103,7 @@ newaction {
 		f:close()
 		io.output(path.join(MODULE_DIR, "src/version.h"))
 		io.write("/*\n")
-		io.write(" * Copyright 2011-2020 Branimir Karadzic. All rights reserved.\n")
+		io.write(" * Copyright 2011-2021 Branimir Karadzic. All rights reserved.\n")
 		io.write(" * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n")
 		io.write(" */\n")
 		io.write("\n")
@@ -255,7 +255,7 @@ function exampleProjectDefaults()
 				}
 			end
 
-		configuration { "osx" }
+		configuration { "osx*" }
 			libdirs { "$(SDL2_DIR)/lib" }
 
 		configuration {}
@@ -280,7 +280,7 @@ function exampleProjectDefaults()
 				}
 			end
 
-		configuration { "osx" }
+		configuration { "osx*" }
 			linkoptions {
 				"-framework CoreVideo",
 				"-framework IOKit",
@@ -401,7 +401,7 @@ function exampleProjectDefaults()
 			"pthread",
 		}
 
-	configuration { "osx" }
+	configuration { "osx*" }
 		linkoptions {
 			"-framework Cocoa",
 			"-framework QuartzCore",
@@ -581,6 +581,8 @@ or _OPTIONS["with-combined-examples"] then
 		, "40-svt"
 		, "41-tess"
 		, "42-bunnylod"
+		, "43-denoise"
+		, "44-sss"
 		)
 
 	-- 17-drawstress requires multithreading, does not compile for singlethreaded wasm
