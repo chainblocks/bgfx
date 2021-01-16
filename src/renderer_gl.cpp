@@ -6528,7 +6528,7 @@ namespace bgfx { namespace gl
 		if( 0 != (m_attachment->multiview&BGFX_MULTIVIEW_COLOR) )
 		{
 			// attach texture to multiview color
-#ifdef BX_PLATFORM_EMSCRIPTEN
+#if BX_PLATFORM_EMSCRIPTEN
 			const TextureGL& texture = s_renderGL->m_textures[m_attachment->handle.idx];
 			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_fbo[0]) );
 			GL_CHECK(glFramebufferTextureMultiviewOVR(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture.m_id, 0, 0, 2) );
@@ -6538,7 +6538,7 @@ namespace bgfx { namespace gl
 		else if( 0 != (m_attachment->multiview&BGFX_MULTIVIEW_DEPTH) )
 		{
 			// attach texture to multiview depth
-#ifdef BX_PLATFORM_EMSCRIPTEN
+#if BX_PLATFORM_EMSCRIPTEN
 			const TextureGL& texture = s_renderGL->m_textures[m_attachment->handle.idx];
 			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_fbo[0]) );
 			GL_CHECK(glFramebufferTextureMultiviewOVR(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, texture.m_id, 0, 0, 2) );
