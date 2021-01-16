@@ -665,6 +665,8 @@ namespace bgfx { namespace gl
 			WEBKIT_WEBGL_compressed_texture_s3tc,
 			WEBKIT_WEBGL_depth_texture,
 
+			OVR_multiview2,
+
 			Count
 		};
 
@@ -877,6 +879,7 @@ namespace bgfx { namespace gl
 		{ "WEBKIT_EXT_texture_filter_anisotropic",    false,                             true  },
 		{ "WEBKIT_WEBGL_compressed_texture_s3tc",     false,                             true  },
 		{ "WEBKIT_WEBGL_depth_texture",               false,                             true  },
+		{ "OVR_multiview2",                           false,                             true  },
 	};
 	BX_STATIC_ASSERT(Extension::Count == BX_COUNTOF(s_extension) );
 
@@ -6389,6 +6392,12 @@ namespace bgfx { namespace gl
 							}
 						}
 
+						if (!bx::findIdentifierMatch(code, "OVR_multiview2").isEmpty() )
+						{
+							BGFX_FATAL(!s_extension[Extension::OVR_multiview2].m_supported, Fatal::InvalidShader, "OVR_multiview2 not supported!");
+							bx::write(&writer, "#extension GL_OVR_multiview2 : require\nlayout(num_views=2) in;\n");
+						}
+
 						if (!bx::findIdentifierMatch(code, s_ARB_texture_multisample).isEmpty() )
 						{
 							bx::write(&writer, "#extension GL_ARB_texture_multisample : enable\n");
@@ -6515,6 +6524,15 @@ namespace bgfx { namespace gl
 		bx::memCopy(m_attachment, _attachment, _num*sizeof(Attachment) );
 
 		m_needPresent = false;
+
+		if( 0 != (m_attachment->multiview&BGFX_MULTIVIEW_COLOR) )
+		{
+			// attach texture to multiview color
+		}
+		else if( 0 != (m_attachment->multiview&BGFX_MULTIVIEW_COLOR) )
+		{
+			// attach texture to multiview depth
+		}
 
 		postReset();
 	}

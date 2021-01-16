@@ -904,6 +904,7 @@ namespace bgfx
 			, uint16_t _numLayers = 1
 			, uint16_t _mip = 0
 			, uint8_t _resolve = BGFX_RESOLVE_AUTO_GEN_MIPS
+			, uint8_t _multiview = BGFX_MULTIVIEW_NONE
 			);
 
 		Access::Enum  access; //!< Attachement access. See `Access::Enum`.
@@ -912,6 +913,7 @@ namespace bgfx
 		uint16_t layer;       //!< Cubemap side or depth layer/slice to use.
 		uint16_t numLayers;   //!< Number of texture layer/slice(s) in array to use.
 		uint8_t  resolve;     //!< Resolve flags. See: `BGFX_RESOLVE_*`
+		uint8_t  multiview;   //!< VR multiview single pass rendering flags. See: `BGFX_MULTIVIEW_*`
 	};
 
 	/// Transform data.

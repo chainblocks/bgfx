@@ -18,6 +18,10 @@ extern "C" void* emscripten_GetProcAddress(const char *name_);
 extern "C" void* emscripten_webgl1_get_proc_address(const char *name_);
 extern "C" void* emscripten_webgl2_get_proc_address(const char *name_);
 
+EM_JS(void, glFramebufferTextureMultiviewOVR, (GLenum target, GLenum attachment, GLuint texture, GLint level, GLint baseViewIndex, GLsizei numViews), {
+	GLctx['framebufferTextureMultiviewOVR'](target, attachment, texture, level, baseViewIndex, numViews);
+});
+
 namespace bgfx { namespace gl
 {
 
@@ -78,6 +82,15 @@ namespace bgfx { namespace gl
 		{
 			EMSCRIPTEN_CHECK(emscripten_set_canvas_element_size(canvas, (int)_width, (int)_height) );
 		}
+
+		EM_ASM({
+			var ext = $0.getExtension('OVR_multiview2');
+			if(ext) {
+				$0['framebufferTextureMultiviewOVR'] = function(target, attachment, texture, level, baseViewIndex, numViews) {
+					ext['framebufferTextureMultiviewOVR'](target, attachment, texture, level, baseViewIndex, numViews);
+				};
+			}
+		}, m_primary);
 
 		makeCurrent(m_primary);
 	}
