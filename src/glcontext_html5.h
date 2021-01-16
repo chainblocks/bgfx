@@ -10,6 +10,8 @@
 
 namespace bgfx { namespace gl
 {
+	void glFramebufferTextureMultiviewOVR(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint baseViewIndex, GLsizei numViews);
+
 	struct SwapChainGL;
 
 	struct GlContext

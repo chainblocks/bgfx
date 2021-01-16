@@ -18,12 +18,15 @@ extern "C" void* emscripten_GetProcAddress(const char *name_);
 extern "C" void* emscripten_webgl1_get_proc_address(const char *name_);
 extern "C" void* emscripten_webgl2_get_proc_address(const char *name_);
 
-EM_JS(void, glFramebufferTextureMultiviewOVR, (GLenum target, GLenum attachment, GLuint texture, GLint level, GLint baseViewIndex, GLsizei numViews), {
+EM_JS(void, emscripten_glFramebufferTextureMultiviewOVR, (GLenum target, GLenum attachment, GLuint texture, GLint level, GLint baseViewIndex, GLsizei numViews), {
 	GLctx['framebufferTextureMultiviewOVR'](target, attachment, texture, level, baseViewIndex, numViews);
 });
 
 namespace bgfx { namespace gl
 {
+	void glFramebufferTextureMultiviewOVR(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint baseViewIndex, GLsizei numViews) {
+		emscripten_glFramebufferTextureMultiviewOVR(target, attachment, texture, level, baseViewIndex, numViews);
+	}
 
 #	define GL_IMPORT(_optional, _proto, _func, _import) _proto _func = NULL
 #	include "glimports.h"
@@ -82,15 +85,6 @@ namespace bgfx { namespace gl
 		{
 			EMSCRIPTEN_CHECK(emscripten_set_canvas_element_size(canvas, (int)_width, (int)_height) );
 		}
-
-		EM_ASM({
-			var ext = $0.getExtension('OVR_multiview2');
-			if(ext) {
-				$0['framebufferTextureMultiviewOVR'] = function(target, attachment, texture, level, baseViewIndex, numViews) {
-					ext['framebufferTextureMultiviewOVR'](target, attachment, texture, level, baseViewIndex, numViews);
-				};
-			}
-		}, m_primary);
 
 		makeCurrent(m_primary);
 	}
@@ -225,6 +219,19 @@ namespace bgfx { namespace gl
 
 #	undef GL_EXTENSION
 
+		// also import some extra webgl2 extensions
+		if(_webGLVersion >= 2)
+		{
+			EM_ASM({
+				var ext = GLctx.getExtension('OVR_multiview2');
+				if(ext) {
+					GLctx['framebufferTextureMultiviewOVR'] = function(target, attachment, texture, level, baseViewIndex, numViews) {
+						ext['framebufferTextureMultiviewOVR'](target, attachment, texture, level, baseViewIndex, numViews);
+					};
+					console.log("OVR_multiview2 support found!");
+				}
+			});
+	  }
 	}
 
 } /* namespace gl */ } // namespace bgfx

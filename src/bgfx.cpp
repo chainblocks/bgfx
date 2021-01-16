@@ -3399,7 +3399,7 @@ namespace bgfx
 	{
 	}
 
-	void Attachment::init(TextureHandle _handle, Access::Enum _access, uint16_t _layer, uint16_t _numLayers, uint16_t _mip, uint8_t _resolve)
+	void Attachment::init(TextureHandle _handle, Access::Enum _access, uint16_t _layer, uint16_t _numLayers, uint16_t _mip, uint8_t _resolve, uint8_t _multiview)
 	{
 		access    = _access;
 		handle    = _handle;
@@ -3407,6 +3407,7 @@ namespace bgfx
 		layer     = _layer;
 		numLayers = _numLayers;
 		resolve   = _resolve;
+		multiview = _multiview;
 	}
 
 	bool init(const Init& _userInit)
