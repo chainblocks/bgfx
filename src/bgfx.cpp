@@ -76,9 +76,7 @@ namespace bgfx
 			{
 				bgfx::trace(_filePath, _line, "BGFX 0x%08x: %s\n", _code, _str);
 				BX_UNUSED(_code, _str);
-				// chainblocks - interrupt the chain with a throw rather then abort
-				// abort();
-				throw std::runtime_error(_str);
+				abort();
 			}
 		}
 
