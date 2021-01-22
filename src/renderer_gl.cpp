@@ -6577,19 +6577,21 @@ namespace bgfx { namespace gl
 						++colorIdx;
 					}
 
-					if (0 != texture.m_rbo)
+					if( 0 != texture.m_id && 0 != (at.multiview&BGFX_MULTIVIEW_FRAMEBUFFER) )
 					{
-						if( 0 != (at.multiview&BGFX_MULTIVIEW_FRAMEBUFFER) )
-						{
 #if BX_PLATFORM_EMSCRIPTEN
-							GL_CHECK(glFramebufferTextureMultiviewOVR(GL_FRAMEBUFFER
-								, attachment
-								, texture.m_id
-								, 0, 0, 2) );
+						GL_CHECK(glFramebufferTextureMultiviewOVR(GL_FRAMEBUFFER
+							, attachment
+							, texture.m_id
+							, 0, 0, 2) );
+#else
+						BGFX_FATAL(false, bgfx::Fatal::UnableToInitialize, "glFramebufferTextureMultiviewOVR not implemented for this platform!");
 #endif
-						}
+					}
+					else if (0 != texture.m_rbo)
+					{
 #if !(BGFX_CONFIG_RENDERER_OPENGL >= 30 || BGFX_CONFIG_RENDERER_OPENGLES >= 30)
-						else if (GL_DEPTH_STENCIL_ATTACHMENT == attachment)
+						if (GL_DEPTH_STENCIL_ATTACHMENT == attachment)
 						{
 							GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER
 								, GL_DEPTH_ATTACHMENT
@@ -6602,8 +6604,8 @@ namespace bgfx { namespace gl
 								, texture.m_rbo
 								) );
 						}
-#endif
 						else
+#endif
 						{
 							GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER
 								, attachment
