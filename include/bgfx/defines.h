@@ -531,8 +531,7 @@
 #define BGFX_CUBE_MAP_NEGATIVE_Z            UINT8_C(0x05) //!< Cubemap -z.
 
 #define BGFX_MULTIVIEW_NONE                 UINT8_C(0x00) //!< No multiview flags.
-#define BGFX_MULTIVIEW_COLOR                UINT8_C(0x01) //!< VR multiview color
-#define BGFX_MULTIVIEW_DEPTH                UINT8_C(0x02) //!< VR multiview depth
+#define BGFX_MULTIVIEW_FRAMEBUFFER          UINT8_C(0x01) //!< VR multiview color
 
 /// Blend function separate.
 #define BGFX_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA) (UINT64_C(0) \
