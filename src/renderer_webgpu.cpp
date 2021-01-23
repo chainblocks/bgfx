@@ -973,6 +973,16 @@ namespace bgfx { namespace webgpu
 			}
 		}
 
+		void overrideInternal(FrameBufferHandle _handle, uintptr_t _ptr) override
+		{
+			BGFX_FATAL(false, bgfx::Fatal::UnableToInitialize, "FrameBufferHandle overrideInternal not implemented");
+		}
+
+		uintptr_t getInternal(TextureHandle _handle) override
+		{
+			BGFX_FATAL(false, bgfx::Fatal::UnableToInitialize, "FrameBufferHandle getInternal not implemented");
+		}
+
 		void createUniform(UniformHandle _handle, UniformType::Enum _type, uint16_t _num, const char* _name) override
 		{
 			if (NULL != m_uniforms[_handle.idx])

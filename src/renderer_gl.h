@@ -624,7 +624,7 @@ typedef uint64_t GLuint64;
 #	define GL_MAX_SAMPLES 0x8D57
 #endif // GL_MAX_SAMPLES
 
-#ifndef GL_MAX_SAMPLES_IMG 
+#ifndef GL_MAX_SAMPLES_IMG
 #   define GL_MAX_SAMPLES_IMG 0x9135
 #endif // GL_MAX_SAMPLES_IMG
 
@@ -1445,12 +1445,14 @@ namespace bgfx { namespace gl
 			, m_denseIdx(UINT16_MAX)
 			, m_num(0)
 			, m_needPresent(false)
+			, m_shared(false)
 		{
 			bx::memSet(m_fbo, 0, sizeof(m_fbo) );
 		}
 
 		void create(uint8_t _num, const Attachment* _attachment);
 		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _format, TextureFormat::Enum _depthFormat);
+		void overrideInternal(uintptr_t _ptr);
 		void postReset();
 		uint16_t destroy();
 		void resolve();
@@ -1465,6 +1467,7 @@ namespace bgfx { namespace gl
 		uint8_t  m_numTh;
 		bool     m_needPresent;
 		Attachment m_attachment[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
+		bool     m_shared;
 	};
 
 	struct ProgramGL

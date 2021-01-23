@@ -3385,6 +3385,16 @@ namespace bgfx { namespace gl
 			}
 		}
 
+		void overrideInternal(FrameBufferHandle _handle, uintptr_t _ptr) override
+		{
+			m_frameBuffers[_handle.idx].overrideInternal(_ptr);
+		}
+
+		uintptr_t getInternal(FrameBufferHandle _handle) override
+		{
+			return uintptr_t(m_frameBuffers[_handle.idx].m_fbo[0]);
+		}
+
 		void createUniform(UniformHandle _handle, UniformType::Enum _type, uint16_t _num, const char* _name) override
 		{
 			if (NULL != m_uniforms[_handle.idx])
@@ -6528,6 +6538,14 @@ namespace bgfx { namespace gl
 		postReset();
 	}
 
+	void FrameBufferGL::overrideInternal(uintptr_t _ptr)
+	{
+		destroy();
+		m_shared = true;
+		m_fbo[0] = (GLuint)_ptr;
+		postReset();
+	}
+
 	void FrameBufferGL::postReset()
 	{
 		if (0 != m_fbo[0])
@@ -6744,7 +6762,7 @@ namespace bgfx { namespace gl
 
 	uint16_t FrameBufferGL::destroy()
 	{
-		if (0 != m_num)
+		if (!m_shared && 0 != m_num)
 		{
 			GL_CHECK(glDeleteFramebuffers(0 == m_fbo[1] ? 1 : 2, m_fbo) );
 			m_num = 0;

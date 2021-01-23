@@ -2769,6 +2769,16 @@ VK_IMPORT_DEVICE
 			m_frameBuffers[_handle.idx].destroy();
 		}
 
+		void overrideInternal(FrameBufferHandle _handle, uintptr_t _ptr) override
+		{
+			BGFX_FATAL(false, bgfx::Fatal::UnableToInitialize, "FrameBufferHandle overrideInternal not implemented");
+		}
+
+		uintptr_t getInternal(FrameBufferHandle _handle) override
+		{
+			BGFX_FATAL(false, bgfx::Fatal::UnableToInitialize, "FrameBufferHandle getInternal not implemented");
+		}
+
 		void createUniform(UniformHandle _handle, UniformType::Enum _type, uint16_t _num, const char* _name) override
 		{
 			if (NULL != m_uniforms[_handle.idx])

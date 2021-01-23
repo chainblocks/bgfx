@@ -132,6 +132,24 @@ namespace bgfx
 		, uint64_t _flags = BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE
 		);
 
+	/// Override internal framebuffer with externally created framebuffer. Previously
+	/// created internal framebuffer will released.
+	///
+	/// @attention It's expected you understand some bgfx internals before you
+	///   use this call.
+	///
+	/// @param[in] _handle Framebuffer handle.
+	/// @param[in] _ptr Native API pointer to framebuffer.
+	///
+	/// @returns Native API pointer to framebuffer. If result is 0, framebuffer is not created yet from the
+	///   main thread.
+	///
+	/// @warning Must be called only on render thread.
+	///
+	/// @attention C99 equivalent is `bgfx_override_internal_texture_ptr`.
+	///
+	uintptr_t overrideInternal(FrameBufferHandle _handle, uintptr_t _ptr);
+
 } // namespace bgfx
 
 #endif // BGFX_PLATFORM_H_HEADER_GUARD

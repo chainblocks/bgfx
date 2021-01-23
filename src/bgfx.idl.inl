@@ -979,6 +979,12 @@ BGFX_C_API uintptr_t bgfx_override_internal_texture_ptr(bgfx_texture_handle_t _h
 	return bgfx::overrideInternal(handle.cpp, _ptr);
 }
 
+BGFX_C_API uintptr_t bgfx_override_internal_framebuffer_ptr(bgfx_frame_buffer_handle_t _handle, uintptr_t _ptr)
+{
+	union { bgfx_frame_buffer_handle_t c; bgfx::FrameBufferHandle cpp; } handle = { _handle };
+	return bgfx::overrideInternal(handle.cpp, _ptr);
+}
+
 BGFX_C_API uintptr_t bgfx_override_internal_texture(bgfx_texture_handle_t _handle, uint16_t _width, uint16_t _height, uint8_t _numMips, bgfx_texture_format_t _format, uint64_t _flags)
 {
 	union { bgfx_texture_handle_t c; bgfx::TextureHandle cpp; } handle = { _handle };

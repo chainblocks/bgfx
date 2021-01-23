@@ -207,6 +207,15 @@ namespace bgfx { namespace noop
 		{
 		}
 
+		void overrideInternal(FrameBufferHandle /*_handle*/, uintptr_t /*_ptr*/) override
+		{
+		}
+
+		uintptr_t getInternal(FrameBufferHandle /*_handle*/) override
+		{
+			return 0;
+		}
+
 		void createUniform(UniformHandle /*_handle*/, UniformType::Enum /*_type*/, uint16_t /*_num*/, const char* /*_name*/) override
 		{
 		}

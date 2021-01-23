@@ -4746,6 +4746,20 @@ namespace bgfx
 		s_ctx->destroyFrameBuffer(_handle);
 	}
 
+	uintptr_t overrideInternal(FrameBufferHandle _handle, uintptr_t _ptr)
+	{
+		BGFX_CHECK_RENDER_THREAD();
+		RendererContextI* rci = s_ctx->m_renderCtx;
+		if (0 == rci->getInternal(_handle) )
+		{
+			return 0;
+		}
+
+		rci->overrideInternal(_handle, _ptr);
+
+		return rci->getInternal(_handle);
+	}
+
 	UniformHandle createUniform(const char* _name, UniformType::Enum _type, uint16_t _num)
 	{
 		return s_ctx->createUniform(_name, _type, _num);
