@@ -6543,7 +6543,9 @@ namespace bgfx { namespace gl
 		destroy();
 		m_shared = true;
 		m_fbo[0] = (GLuint)_ptr;
-		postReset();
+		// don't call postReset as this buffer is managed externally
+		// just set size here
+		m_num = 1;
 	}
 
 	void FrameBufferGL::postReset()
