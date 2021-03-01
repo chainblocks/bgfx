@@ -525,6 +525,7 @@ namespace bgfx { namespace gl
 			ARB_occlusion_query,
 			ARB_occlusion_query2,
 			ARB_program_interface_query,
+			ARB_provoking_vertex,
 			ARB_sampler_objects,
 			ARB_seamless_cube_map,
 			ARB_shader_bit_encoding,
@@ -740,6 +741,7 @@ namespace bgfx { namespace gl
 		{ "ARB_occlusion_query",                      BGFX_CONFIG_RENDERER_OPENGL >= 33, true  },
 		{ "ARB_occlusion_query2",                     BGFX_CONFIG_RENDERER_OPENGL >= 33, true  },
 		{ "ARB_program_interface_query",              BGFX_CONFIG_RENDERER_OPENGL >= 43, true  },
+		{ "ARB_provoking_vertex",                     BGFX_CONFIG_RENDERER_OPENGL >= 32, true  },
 		{ "ARB_sampler_objects",                      BGFX_CONFIG_RENDERER_OPENGL >= 33, true  },
 		{ "ARB_seamless_cube_map",                    BGFX_CONFIG_RENDERER_OPENGL >= 32, true  },
 		{ "ARB_shader_bit_encoding",                  BGFX_CONFIG_RENDERER_OPENGL >= 33, true  },
@@ -3004,6 +3006,12 @@ namespace bgfx { namespace gl
 				if (s_extension[Extension::ARB_seamless_cube_map].m_supported)
 				{
 					GL_CHECK(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS) );
+				}
+
+				if (NULL != glProvokingVertex
+				&&  s_extension[Extension::ARB_provoking_vertex].m_supported)
+				{
+					GL_CHECK(glProvokingVertex(GL_FIRST_VERTEX_CONVENTION) );
 				}
 
 				if (NULL == glInsertEventMarker
@@ -6495,11 +6503,10 @@ namespace bgfx { namespace gl
 				GLsizei len;
 				char log[1024];
 				GL_CHECK(glGetShaderInfoLog(m_id, sizeof(log), &len, log) );
-				BX_TRACE("Failed to compile shader. %d: %s", compiled, log);
 
 				GL_CHECK(glDeleteShader(m_id) );
 				m_id = 0;
-				BGFX_FATAL(false, bgfx::Fatal::InvalidShader, "Failed to compile shader. %d: %s - code: %s", compiled, log, code.getPtr());
+				BGFX_FATAL(false, bgfx::Fatal::InvalidShader, "Failed to compile shader. %d: %s", compiled, log);
 			}
 			else if (BX_ENABLED(BGFX_CONFIG_DEBUG)
 				 &&  s_extension[Extension::ANGLE_translated_shader_source].m_supported

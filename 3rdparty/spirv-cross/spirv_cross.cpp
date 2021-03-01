@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 Arm Limited
+ * Copyright 2015-2021 Arm Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -546,10 +546,16 @@ bool Compiler::is_hidden_variable(const SPIRVariable &var, bool include_builtins
 		return false;
 	}
 
-	bool hidden = false;
-	if (check_active_interface_variables && storage_class_is_interface(var.storage))
-		hidden = active_interface_variables.find(var.self) == end(active_interface_variables);
-	return hidden;
+	// In SPIR-V 1.4 and up we must also use the active variable interface to disable global variables
+	// which are not part of the entry point.
+	if (ir.get_spirv_version() >= 0x10400 && var.storage != spv::StorageClassGeneric &&
+	    var.storage != spv::StorageClassFunction && !interface_variable_exists_in_entry_point(var.self))
+	{
+		return true;
+	}
+
+	return check_active_interface_variables && storage_class_is_interface(var.storage) &&
+	       active_interface_variables.find(var.self) == end(active_interface_variables);
 }
 
 bool Compiler::is_builtin_type(const SPIRType &type) const
@@ -2829,7 +2835,8 @@ const SPIRConstant &Compiler::get_constant(ConstantID id) const
 	return get<SPIRConstant>(id);
 }
 
-static bool exists_unaccessed_path_to_return(const CFG &cfg, uint32_t block, const unordered_set<uint32_t> &blocks)
+static bool exists_unaccessed_path_to_return(const CFG &cfg, uint32_t block, const unordered_set<uint32_t> &blocks,
+                                             unordered_set<uint32_t> &visit_cache)
 {
 	// This block accesses the variable.
 	if (blocks.find(block) != end(blocks))
@@ -2841,8 +2848,14 @@ static bool exists_unaccessed_path_to_return(const CFG &cfg, uint32_t block, con
 
 	// If any of our successors have a path to the end, there exists a path from block.
 	for (auto &succ : cfg.get_succeeding_edges(block))
-		if (exists_unaccessed_path_to_return(cfg, succ, blocks))
-			return true;
+	{
+		if (visit_cache.count(succ) == 0)
+		{
+			if (exists_unaccessed_path_to_return(cfg, succ, blocks, visit_cache))
+				return true;
+			visit_cache.insert(succ);
+		}
+	}
 
 	return false;
 }
@@ -2899,7 +2912,8 @@ void Compiler::analyze_parameter_preservation(
 		// void foo(int &var) { if (cond) var = 10; }
 		// Using read/write counts, we will think it's just an out variable, but it really needs to be inout,
 		// because if we don't write anything whatever we put into the function must return back to the caller.
-		if (exists_unaccessed_path_to_return(cfg, entry.entry_block, itr->second))
+		unordered_set<uint32_t> visit_cache;
+		if (exists_unaccessed_path_to_return(cfg, entry.entry_block, itr->second, visit_cache))
 			arg.read_count++;
 	}
 }

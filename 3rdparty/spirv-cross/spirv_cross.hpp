@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 Arm Limited
+ * Copyright 2015-2021 Arm Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -497,6 +497,12 @@ public:
 	// of direct decorations on the variable itself.
 	// The most common use here is to check if a buffer is readonly or writeonly.
 	Bitset get_buffer_block_flags(VariableID id) const;
+
+	// Returns whether the position output is invariant
+	bool is_position_invariant() const
+	{
+		return position_invariant;
+	}
 
 protected:
 	const uint32_t *stream(const Instruction &instr) const
