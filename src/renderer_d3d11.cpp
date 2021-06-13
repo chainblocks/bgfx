@@ -665,6 +665,7 @@ namespace bgfx { namespace d3d11
 			, m_ags(NULL)
 			, m_featureLevel(D3D_FEATURE_LEVEL(0) )
 			, m_swapChain(NULL)
+			, m_msaaRt(NULL)
 			, m_needPresent(false)
 			, m_lost(false)
 			, m_numWindows(0)
@@ -1272,11 +1273,6 @@ namespace bgfx { namespace d3d11
 				if (m_featureLevel == D3D_FEATURE_LEVEL_10_0
 				||  m_featureLevel == D3D_FEATURE_LEVEL_10_1)
 				{
-					struct D3D11_FEATURE_DATA_D3D10_X_HARDWARE_OPTIONS
-					{
-						BOOL ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x;
-					};
-
 					D3D11_FEATURE_DATA_D3D10_X_HARDWARE_OPTIONS data;
 					HRESULT hr = m_device->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS, &data, sizeof(data) );
 					if (SUCCEEDED(hr)
@@ -1297,13 +1293,8 @@ namespace bgfx { namespace d3d11
 				}
 				else
 				{
-					struct D3D11_FEATURE_DATA_D3D9_SIMPLE_INSTANCING_SUPPORT
-					{
-						BOOL SimpleInstancingSupported;
-					};
-
 					D3D11_FEATURE_DATA_D3D9_SIMPLE_INSTANCING_SUPPORT data;
-					HRESULT hr = m_device->CheckFeatureSupport(D3D11_FEATURE(11) /*D3D11_FEATURE_D3D9_SIMPLE_INSTANCING_SUPPORT*/, &data, sizeof(data) );
+					HRESULT hr = m_device->CheckFeatureSupport(D3D11_FEATURE_D3D9_SIMPLE_INSTANCING_SUPPORT, &data, sizeof(data) );
 					if (SUCCEEDED(hr)
 					&&  data.SimpleInstancingSupported)
 					{
@@ -1314,17 +1305,23 @@ namespace bgfx { namespace d3d11
 				// shadow compare is optional on 9_1 through 9_3 targets
 				if (m_featureLevel <= D3D_FEATURE_LEVEL_9_3)
 				{
-					struct D3D11_FEATURE_DATA_D3D9_SHADOW_SUPPORT
-					{
-						BOOL SupportsDepthAsTextureWithLessEqualComparisonFilter;
-					};
-
 					D3D11_FEATURE_DATA_D3D9_SHADOW_SUPPORT data;
-					HRESULT hr = m_device->CheckFeatureSupport(D3D11_FEATURE(9) /*D3D11_FEATURE_D3D9_SHADOW_SUPPORT*/, &data, sizeof(data) );
+					HRESULT hr = m_device->CheckFeatureSupport(D3D11_FEATURE_D3D9_SHADOW_SUPPORT, &data, sizeof(data) );
 					if (SUCCEEDED(hr)
 					&&  data.SupportsDepthAsTextureWithLessEqualComparisonFilter)
 					{
 						g_caps.supported |= BGFX_CAPS_TEXTURE_COMPARE_LEQUAL;
+					}
+				}
+
+				// support for SV_ViewportArrayIndex and SV_RenderTargetArrayIndex in the vertex shader is optional
+				{
+					D3D11_FEATURE_DATA_D3D11_OPTIONS3 data;
+					HRESULT hr = m_device->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS3, &data, sizeof(data) );
+					if (SUCCEEDED(hr)
+					&&  data.VPAndRTArrayIndexFromAnyShaderFeedingRasterizer)
+					{
+						g_caps.supported |= BGFX_CAPS_VIEWPORT_LAYER_ARRAY;
 					}
 				}
 
@@ -1342,13 +1339,7 @@ namespace bgfx { namespace d3d11
 					{
 						if (BX_ENABLED(BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT) )
 						{
-							struct D3D11_FEATURE_DATA_FORMAT_SUPPORT
-							{
-								DXGI_FORMAT InFormat;
-								UINT OutFormatSupport;
-							};
-
-							D3D11_FEATURE_DATA_FORMAT_SUPPORT data; // D3D11_FEATURE_DATA_FORMAT_SUPPORT2
+							D3D11_FEATURE_DATA_FORMAT_SUPPORT data;
 							data.InFormat = fmt;
 							HRESULT hr = m_device->CheckFeatureSupport(D3D11_FEATURE_FORMAT_SUPPORT, &data, sizeof(data) );
 							if (SUCCEEDED(hr) )
@@ -1432,21 +1423,23 @@ namespace bgfx { namespace d3d11
 
 							if (0 != (support & BGFX_CAPS_FORMAT_TEXTURE_IMAGE_READ) )
 							{
+								D3D11_FEATURE_DATA_FORMAT_SUPPORT2 data2;
+
 								// clear image flag for additional testing
 								support &= ~BGFX_CAPS_FORMAT_TEXTURE_IMAGE_READ;
 
-								data.InFormat = s_textureFormat[ii].m_fmt;
-								hr = m_device->CheckFeatureSupport(D3D11_FEATURE_FORMAT_SUPPORT2, &data, sizeof(data) );
+								data2.InFormat = s_textureFormat[ii].m_fmt;
+								hr = m_device->CheckFeatureSupport(D3D11_FEATURE_FORMAT_SUPPORT2, &data2, sizeof(data2) );
 								if (SUCCEEDED(hr) )
 								{
-									support |= 0 != (data.OutFormatSupport & (0
+									support |= 0 != (data2.OutFormatSupport2 & (0
 											| D3D11_FORMAT_SUPPORT2_UAV_TYPED_LOAD
 											) )
 											? BGFX_CAPS_FORMAT_TEXTURE_IMAGE_READ
 											: BGFX_CAPS_FORMAT_TEXTURE_NONE
 											;
 
-									support |= 0 != (data.OutFormatSupport & (0
+									support |= 0 != (data2.OutFormatSupport2 & (0
 											| D3D11_FORMAT_SUPPORT2_UAV_TYPED_STORE
 											) )
 											? BGFX_CAPS_FORMAT_TEXTURE_IMAGE_WRITE
@@ -1481,7 +1474,7 @@ namespace bgfx { namespace d3d11
 								UINT OutFormatSupport;
 							};
 
-							D3D11_FEATURE_DATA_FORMAT_SUPPORT data; // D3D11_FEATURE_DATA_FORMAT_SUPPORT2
+							D3D11_FEATURE_DATA_FORMAT_SUPPORT data;
 							data.InFormat = fmtSrgb;
 							HRESULT hr = m_device->CheckFeatureSupport(D3D11_FEATURE_FORMAT_SUPPORT, &data, sizeof(data) );
 							if (SUCCEEDED(hr) )
@@ -1594,6 +1587,10 @@ namespace bgfx { namespace d3d11
 				DX_RELEASE(m_annotation, 1);
 				DX_RELEASE_W(m_infoQueue, 0);
 				DX_RELEASE(m_msaaRt, 0);
+#if BX_PLATFORM_WINRT
+				// Remove swap chain from SwapChainPanel (nwh) if applicable
+				m_dxgi.removeSwapChain(m_scd, &m_swapChain);
+#endif
 				DX_RELEASE(m_swapChain, 0);
 				DX_RELEASE(m_deviceCtx, 0);
 				DX_RELEASE(m_device, 0);
@@ -1681,6 +1678,10 @@ namespace bgfx { namespace d3d11
 			DX_RELEASE(m_annotation, 1);
 			DX_RELEASE_W(m_infoQueue, 0);
 			DX_RELEASE(m_msaaRt, 0);
+#if BX_PLATFORM_WINRT
+			// Remove swap chain from SwapChainPanel (nwh) if applicable
+			m_dxgi.removeSwapChain(m_scd, &m_swapChain);
+#endif
 			DX_RELEASE(m_swapChain, 0);
 			DX_RELEASE(m_deviceCtx, 0);
 			DX_RELEASE(m_device, 0);
@@ -2361,6 +2362,22 @@ namespace bgfx { namespace d3d11
 			}
 		}
 
+		void updateNativeWindow()
+		{
+#if BX_PLATFORM_WINRT
+			// SwapChainPanels can be dynamically updated
+			if (m_scd.ndt == reinterpret_cast<void*>(2)
+				&& (m_scd.nwh != g_platformData.nwh || m_scd.ndt != g_platformData.ndt))
+			{
+				// Remove swap chain from SwapChainPanel (nwh) if applicable
+				m_dxgi.removeSwapChain(m_scd, &m_swapChain);
+				// Update nwh after removing swap chain
+				m_scd.nwh = g_platformData.nwh;
+				m_scd.ndt = g_platformData.ndt;
+			}
+#endif
+		}
+
 		bool updateResolution(const Resolution& _resolution)
 		{
 			const bool suspended    = !!( _resolution.reset & BGFX_RESET_SUSPEND);
@@ -2466,8 +2483,11 @@ namespace bgfx { namespace d3d11
 						updateMsaa(m_scd.format);
 						m_scd.sampleDesc = s_msaa[(m_resolution.reset&BGFX_RESET_MSAA_MASK)>>BGFX_RESET_MSAA_SHIFT];
 
+#if BX_PLATFORM_WINRT
+						// Remove swap chain from SwapChainPanel (nwh) if applicable
+						m_dxgi.removeSwapChain(m_scd, &m_swapChain);
+#endif
 						DX_RELEASE(m_swapChain, 0);
-
 						HRESULT hr = m_dxgi.createSwapChain(m_device
 							, m_scd
 							, &m_swapChain
@@ -4122,6 +4142,12 @@ namespace bgfx { namespace d3d11
 					bx::read(&reader, texInfo);
 				}
 
+				if (!isShaderVerLess(magic, 10) )
+				{
+					uint16_t texFormat = 0;
+					bx::read(&reader, texFormat);
+				}
+
 				const char* kind = "invalid";
 
 				PredefinedUniform::Enum predefined = nameToPredefinedUniformEnum(name);
@@ -4784,14 +4810,18 @@ namespace bgfx { namespace d3d11
 		ts.m_sampler[_stage] = s_renderD3D11->getSamplerState(flags, _palette[index]);
 	}
 
-	void TextureD3D11::resolve(uint8_t _resolve) const
+	void TextureD3D11::resolve(uint8_t _resolve, uint32_t _layer, uint32_t _numLayers, uint32_t _mip) const
 	{
 		ID3D11DeviceContext* deviceCtx = s_renderD3D11->m_deviceCtx;
 
 		const bool needResolve = NULL != m_rt;
 		if (needResolve)
 		{
-			deviceCtx->ResolveSubresource(m_texture2d, 0, m_rt, 0, s_textureFormat[m_textureFormat].m_fmt);
+			for (uint32_t ii = _layer; ii < _numLayers; ++ii)
+			{
+				const UINT resource = _mip + (ii * m_numMips);
+				deviceCtx->ResolveSubresource(m_texture2d, resource, m_rt, resource, s_textureFormat[m_textureFormat].m_fmt);
+			}
 		}
 
 		const bool renderTarget = 0 != (m_flags&BGFX_TEXTURE_RT_MASK);
@@ -5066,7 +5096,7 @@ namespace bgfx { namespace d3d11
 								{
 									desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
 									desc.Texture2DMSArray.FirstArraySlice = at.layer;
-									desc.Texture2DMSArray.ArraySize       = 1;
+									desc.Texture2DMSArray.ArraySize       = at.numLayers;
 								}
 								else
 								{
@@ -5149,7 +5179,7 @@ namespace bgfx { namespace d3d11
 				if (isValid(at.handle) )
 				{
 					const TextureD3D11& texture = s_renderD3D11->m_textures[at.handle.idx];
-					texture.resolve(at.resolve);
+					texture.resolve(at.resolve, at.layer, at.numLayers, at.mip);
 				}
 			}
 		}
@@ -5493,8 +5523,13 @@ namespace bgfx { namespace d3d11
 
 	void RendererContextD3D11::submit(Frame* _render, ClearQuad& _clearQuad, TextVideoMemBlitter& _textVideoMemBlitter)
 	{
-		if (m_lost
-		||  updateResolution(_render->m_resolution) )
+		if (m_lost)
+		{
+			return;
+		}
+
+		updateNativeWindow();
+		if (updateResolution(_render->m_resolution) )
 		{
 			return;
 		}
@@ -5538,6 +5573,8 @@ namespace bgfx { namespace d3d11
 		currentState.clear();
 		currentState.m_stateFlags = BGFX_STATE_NONE;
 		currentState.m_stencil = packStencil(BGFX_STENCIL_NONE, BGFX_STENCIL_NONE);
+
+		uint32_t currentNumVertices = 0;
 
 		RenderBind currentBind;
 		currentBind.clear();
@@ -6169,6 +6206,8 @@ namespace bgfx { namespace d3d11
 						}
 					}
 
+					currentNumVertices = numVertices;
+
 					if (0 < numStreams)
 					{
 						deviceCtx->IASetVertexBuffers(0, numStreams, buffers, strides, offsets);
@@ -6227,7 +6266,7 @@ namespace bgfx { namespace d3d11
 
 				if (0 != currentState.m_streamMask)
 				{
-					uint32_t numVertices       = draw.m_numVertices;
+					uint32_t numVertices       = currentNumVertices;
 					uint32_t numIndices        = 0;
 					uint32_t numPrimsSubmitted = 0;
 					uint32_t numInstances      = 0;

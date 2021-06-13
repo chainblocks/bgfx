@@ -89,6 +89,7 @@ static const SpvCapability pygen_variable_caps_Shader[] = {SpvCapabilityShader};
 static const SpvCapability pygen_variable_caps_ShaderImageCubeArray[] = {SpvCapabilityShader, SpvCapabilityImageCubeArray};
 static const SpvCapability pygen_variable_caps_ShaderKernel[] = {SpvCapabilityShader, SpvCapabilityKernel};
 static const SpvCapability pygen_variable_caps_ShaderKernelImageMSArray[] = {SpvCapabilityShader, SpvCapabilityKernel, SpvCapabilityImageMSArray};
+static const SpvCapability pygen_variable_caps_ShaderVectorComputeINTEL[] = {SpvCapabilityShader, SpvCapabilityVectorComputeINTEL};
 static const SpvCapability pygen_variable_caps_ShaderNonUniform[] = {SpvCapabilityShaderNonUniform};
 static const SpvCapability pygen_variable_caps_ShaderSMBuiltinsNV[] = {SpvCapabilityShaderSMBuiltinsNV};
 static const SpvCapability pygen_variable_caps_ShaderStereoViewNV[] = {SpvCapabilityShaderStereoViewNV};
@@ -158,8 +159,10 @@ static const spvtools::Extension pygen_variable_exts_SPV_INTEL_vector_compute[] 
 static const spvtools::Extension pygen_variable_exts_SPV_KHR_16bit_storage[] = {spvtools::Extension::kSPV_KHR_16bit_storage};
 static const spvtools::Extension pygen_variable_exts_SPV_KHR_8bit_storage[] = {spvtools::Extension::kSPV_KHR_8bit_storage};
 static const spvtools::Extension pygen_variable_exts_SPV_KHR_device_group[] = {spvtools::Extension::kSPV_KHR_device_group};
+static const spvtools::Extension pygen_variable_exts_SPV_KHR_expect_assume[] = {spvtools::Extension::kSPV_KHR_expect_assume};
 static const spvtools::Extension pygen_variable_exts_SPV_KHR_float_controls[] = {spvtools::Extension::kSPV_KHR_float_controls};
 static const spvtools::Extension pygen_variable_exts_SPV_KHR_fragment_shading_rate[] = {spvtools::Extension::kSPV_KHR_fragment_shading_rate};
+static const spvtools::Extension pygen_variable_exts_SPV_KHR_linkonce_odr[] = {spvtools::Extension::kSPV_KHR_linkonce_odr};
 static const spvtools::Extension pygen_variable_exts_SPV_KHR_multiview[] = {spvtools::Extension::kSPV_KHR_multiview};
 static const spvtools::Extension pygen_variable_exts_SPV_KHR_no_integer_wrap_decoration[] = {spvtools::Extension::kSPV_KHR_no_integer_wrap_decoration};
 static const spvtools::Extension pygen_variable_exts_SPV_KHR_post_depth_coverage[] = {spvtools::Extension::kSPV_KHR_post_depth_coverage};
@@ -447,7 +450,7 @@ static const spv_operand_desc_t pygen_variable_StorageClassEntries[] = {
   {"Output", 3, 1, pygen_variable_caps_Shader, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
   {"Workgroup", 4, 0, nullptr, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
   {"CrossWorkgroup", 5, 0, nullptr, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
-  {"Private", 6, 1, pygen_variable_caps_Shader, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
+  {"Private", 6, 2, pygen_variable_caps_ShaderVectorComputeINTEL, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
   {"Function", 7, 0, nullptr, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
   {"Generic", 8, 1, pygen_variable_caps_GenericPointer, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
   {"PushConstant", 9, 1, pygen_variable_caps_Shader, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
@@ -603,7 +606,8 @@ static const spv_operand_desc_t pygen_variable_FPOperationModeEntries[] = {
 
 static const spv_operand_desc_t pygen_variable_LinkageTypeEntries[] = {
   {"Export", 0, 1, pygen_variable_caps_Linkage, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
-  {"Import", 1, 1, pygen_variable_caps_Linkage, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu}
+  {"Import", 1, 1, pygen_variable_caps_Linkage, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
+  {"LinkOnceODR", 2, 1, pygen_variable_caps_Linkage, 1, pygen_variable_exts_SPV_KHR_linkonce_odr, {}, 0xffffffffu, 0xffffffffu}
 };
 
 static const spv_operand_desc_t pygen_variable_AccessQualifierEntries[] = {
@@ -1054,6 +1058,7 @@ static const spv_operand_desc_t pygen_variable_CapabilityEntries[] = {
   {"AtomicFloat16MinMaxEXT", 5616, 0, nullptr, 1, pygen_variable_exts_SPV_EXT_shader_atomic_float_min_max, {}, 0xffffffffu, 0xffffffffu},
   {"VectorComputeINTEL", 5617, 1, pygen_variable_caps_VectorAnyINTEL, 1, pygen_variable_exts_SPV_INTEL_vector_compute, {}, 0xffffffffu, 0xffffffffu},
   {"VectorAnyINTEL", 5619, 0, nullptr, 1, pygen_variable_exts_SPV_INTEL_vector_compute, {}, 0xffffffffu, 0xffffffffu},
+  {"ExpectAssumeKHR", 5629, 0, nullptr, 1, pygen_variable_exts_SPV_KHR_expect_assume, {}, 0xffffffffu, 0xffffffffu},
   {"SubgroupAvcMotionEstimationINTEL", 5696, 0, nullptr, 1, pygen_variable_exts_SPV_INTEL_device_side_avc_motion_estimation, {}, 0xffffffffu, 0xffffffffu},
   {"SubgroupAvcMotionEstimationIntraINTEL", 5697, 0, nullptr, 1, pygen_variable_exts_SPV_INTEL_device_side_avc_motion_estimation, {}, 0xffffffffu, 0xffffffffu},
   {"SubgroupAvcMotionEstimationChromaINTEL", 5698, 0, nullptr, 1, pygen_variable_exts_SPV_INTEL_device_side_avc_motion_estimation, {}, 0xffffffffu, 0xffffffffu},
@@ -1096,6 +1101,7 @@ static const spv_operand_desc_t pygen_variable_RayQueryCandidateIntersectionType
 };
 
 static const spv_operand_desc_t pygen_variable_DebugInfoFlagsEntries[] = {
+  {"None", 0x0000, 0, nullptr, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
   {"FlagIsProtected", 0x01, 0, nullptr, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
   {"FlagIsPrivate", 0x02, 0, nullptr, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
   {"FlagIsPublic", 0x03, 0, nullptr, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
@@ -1149,6 +1155,7 @@ static const spv_operand_desc_t pygen_variable_DebugOperationEntries[] = {
 };
 
 static const spv_operand_desc_t pygen_variable_CLDEBUG100_DebugInfoFlagsEntries[] = {
+  {"None", 0x0000, 0, nullptr, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
   {"FlagIsProtected", 0x01, 0, nullptr, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
   {"FlagIsPrivate", 0x02, 0, nullptr, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
   {"FlagIsPublic", 0x03, 0, nullptr, 0, nullptr, {}, SPV_SPIRV_VERSION_WORD(1, 0), 0xffffffffu},
